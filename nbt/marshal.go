@@ -195,7 +195,7 @@ func (e *Encoder) marshal(val reflect.Value, tagName string) error {
 			for i := 0; i < n; i++ {
 				m := val.Index(i).NumField()
 				for j := 0; j < m; j++ {
-					f := val.Type().Field(j)
+					f := val.Index(i).Type().Field(j)
 					tag := f.Tag.Get("nbt")
 					if (f.PkgPath != "" && !f.Anonymous) || tag == "-" {
 						continue // Private field
