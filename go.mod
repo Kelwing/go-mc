@@ -1,4 +1,4 @@
-module github.com/Tnze/go-mc
+module github.com/Kelwing/go-mc
 
 go 1.13
 
