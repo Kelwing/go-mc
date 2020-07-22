@@ -193,9 +193,9 @@ func (e *Encoder) marshal(val reflect.Value, tagName string) error {
 				return err
 			}
 			for i := 0; i < n; i++ {
-				m := val.Index(n).NumField()
-				for i := 0; i < m; i++ {
-					f := val.Type().Field(i)
+				m := val.Index(i).NumField()
+				for j := 0; j < m; j++ {
+					f := val.Type().Field(j)
 					tag := f.Tag.Get("nbt")
 					if (f.PkgPath != "" && !f.Anonymous) || tag == "-" {
 						continue // Private field
@@ -206,13 +206,15 @@ func (e *Encoder) marshal(val reflect.Value, tagName string) error {
 						tagName = tag
 					}
 
-					err := e.marshal(val.Field(i), tagName)
+					err := e.marshal(val.Field(j), tagName)
 					if err != nil {
 						return err
 					}
 				}
 				_, err := e.w.Write([]byte{TagEnd})
-				return err
+				if err != nil {
+					return err
+				}
 			}
 
 		default:
