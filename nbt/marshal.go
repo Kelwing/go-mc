@@ -193,7 +193,7 @@ func (e *Encoder) marshal(val reflect.Value, tagName string) error {
 				return err
 			}
 			for i := 0; i < n; i++ {
-				m := val.Index(i).NumField()
+				m := val.Index(i).Type().NumField()
 				for j := 0; j < m; j++ {
 					f := val.Index(i).Type().Field(j)
 					tag := f.Tag.Get("nbt")
@@ -206,7 +206,7 @@ func (e *Encoder) marshal(val reflect.Value, tagName string) error {
 						tagName = tag
 					}
 
-					err := e.marshal(val.Field(j), tagName)
+					err := e.marshal(val.Index(i).Field(j), tagName)
 					if err != nil {
 						return err
 					}
