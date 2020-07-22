@@ -181,6 +181,40 @@ func (e *Encoder) marshal(val reflect.Value, tagName string) error {
 				}
 			}
 
+		case reflect.Struct:
+			if err := e.writeTag(TagList, tagName); err != nil {
+				return err
+			}
+			if _, err := e.w.Write([]byte{TagCompound}); err != nil {
+				return err
+			}
+			n := val.Len()
+			if err := e.writeInt32(int32(n)); err != nil {
+				return err
+			}
+			for i := 0; i < n; i++ {
+				m := val.Index(n).NumField()
+				for i := 0; i < m; i++ {
+					f := val.Type().Field(i)
+					tag := f.Tag.Get("nbt")
+					if (f.PkgPath != "" && !f.Anonymous) || tag == "-" {
+						continue // Private field
+					}
+
+					tagName := f.Name
+					if tag != "" {
+						tagName = tag
+					}
+
+					err := e.marshal(val.Field(i), tagName)
+					if err != nil {
+						return err
+					}
+				}
+				_, err := e.w.Write([]byte{TagEnd})
+				return err
+			}
+
 		default:
 			return errors.New("unknown type " + val.Type().String() + " slice")
 		}
